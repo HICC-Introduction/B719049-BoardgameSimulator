@@ -1,5 +1,8 @@
 from BoardgameSimulator.Core import Point2
 
+boardtempP = ''
+
+
 class info_repo:
     def __init__(self):
         '''
@@ -41,6 +44,8 @@ class info_repo:
                     self.playinfo[k] = kwargs[k]
                 else:
                     self.board = kwargs[k]
+                    global boardtempP
+                    boardtempP = self.board
 
         if n == 4:
             for l in kwargs.keys():
@@ -73,12 +78,12 @@ class info_repo:
 
 class player_logic:
     def __init__(self):
-        '''
-        This is not used.
-        Still remains for future development.
-        '''
-
         self.playermove = Point2(0,0)
+        self.boardresult = ''
+
+    def logicP(self):
+        board_use = boardtempP
+        pass
 
 
 if __name__ == "__main__":

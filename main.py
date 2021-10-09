@@ -8,6 +8,61 @@ from BoardgameJudge import JudgeACK
 import sys
 
 '''
+This is IDE input example. 
+1. Pre
+TicTacToe;3;3
+
+2. start
+2;1;user1;0;3000;2;Park;0;5000
+
+3. playing game sequence
+3-1. if player is first turn : maketurn - requestjudge - otherturn - requestjudge
+-------- first turn --------
+4000;3;3;0;0;0;0;2;0;0;0;0
+2;1;2;3;3;0;0;0;0;2;0;0;0;0
+1;2;2;3500
+2;1;2;3;3;0;0;0;0;2;0;0;0;1
+-------- second turn -------
+3500;3;3;0;0;0;0;2;0;0;2;1
+2;1;2;3;3;0;0;0;0;2;0;0;2;1
+1;0;0;3000
+2;1;2;3;3;1;0;0;0;2;0;0;0;1
+-------- third turn --------
+3000;3;3;1;2;0;0;2;0;0;2;1
+2;1;2;3;3;1;2;0;0;2;0;0;2;1
+# game end
+----------------------------
+
+3-2. if player is not first turn : otherturn - requestjudge - maketurn - requestjudge
+-------- first turn --------
+1;1;1;3500
+2;1;2;3;3;0;0;0;0;1;0;0;0;0
+4000;3;3;0;0;0;0;1;0;0;0;2
+2;1;2;3;3;0;0;0;0;1;0;0;0;2
+-------- second turn -------
+1;0;0;3500
+2;1;2;3;3;1;0;0;0;1;0;0;0;2
+3500;3;3;1;0;0;0;1;2;0;0;2
+2;1;2;3;3;1;0;0;0;1;2;0;0;2
+-------- third turn --------
+1;0;1;3000
+2;1;2;3;3;1;1;0;0;1;2;0;0;2
+3000;3;3;1;1;2;0;1;2;0;0;2
+2;1;2;3;3;1;1;2;0;1;2;0;0;2
+# game end
+----------------------------
+
+
+4. gameend
+1;2;1;1
+
+'''
+
+
+
+
+
+'''
 1. Game Reset
 Prepare : [World] -> [BoardgamePlayer]
 Enroll : [BoardgamePlayer] -> [World]
@@ -23,7 +78,6 @@ JudgeIR = Judgelogic.repo()
 JudgeL = Judgelogic.judge_logic()
 
 # prepare : BoardgamePrepare
-# test : TicTacToe;3;3
 
 def Pre():
     # get information from process
@@ -76,7 +130,6 @@ def PreACK():
     PlayerM.get_header(ACK_GameReset.header)
     return PlayerM.receive_from_process()
 
-
 '''
 2. Game Start
 Start : [World] -> [BoardgamePlayer]
@@ -84,7 +137,6 @@ ACK : [BoardgamePlayer] -> [World]
 '''
 
 # Start : BoardgameStart
-# test : 2;1;user1;0;3000;2;Park;0;5000
 
 def gamestart():
     # get info from process
@@ -125,14 +177,30 @@ if Temp1 == "STT_OK":
     ACK_gamestart()
 
 '''
+-----------------------------------------------------------------------------------------------------------------------
+여기까지는 OK
+이 아래부터는 def() 함수를 나열한 후, 
+while을 이용하여 반복 개시.
+requestturn이 먼저인지, notifyotherturn이 먼저인지 판단할 것.
+------------------------------------------------------------------------------------------------------------------------
+'''
+
+'''
 3-1. BoardgamePlayer Turn
 MakeTurn : [World] -> [BoardgamePlayer]
 ACK : [BoardgamePlayer] -> [World]
 TurnResult : [BoardgamePlayer] -> [World]
+
+3-2. Other Turn
+OtherTurn : [World] -> [BoardgamePlayer]
+ACK : [BoardgamePlayer] -> [World]
+
+3-3. Request judge
+RequestJudge : [World] -> [BoardgameJudge]
+ACK : [BoardgameJudge] -> [World]
+ReturnJudge : [BoardgameJudge] -> [World]
 '''
 
-# MakeTurn : BoardgameRequestTurn
-# test : 4000;3;3;0;0;0;2;0;0;0;0;0
 
 def maketurn():
     # get info from process
@@ -161,22 +229,6 @@ def ACK_maketurn():
     ACK_MakeTurn = BoardgameAcknowledgement()
     ACK_MakeTurn.send_message_to_process()
 
-TempA = maketurn()
-if TempA == "RQT_OK":
-    ACK_maketurn()
-
-
-# !!! MakeTurn Logic !!!
-
-
-
-
-
-
-
-
-
-# TurnResult : BoardgameResponseTurn
 
 def turnresult():
     TurnResult = BoardgameResponseTurn()
@@ -187,17 +239,6 @@ def turnresult():
 
     # send info to process
     TurnResult.send_message_to_process()
-
-turnresult()
-
-'''
-3-2. Other Turn
-OtherTurn : [World] -> [BoardgamePlayer]
-ACK : [BoardgamePlayer] -> [World]
-'''
-
-# OtherTurn : BoradgameNotifyOtherTurn
-# test : 2;1;1;4000
 
 def otherturn():
     # get info from process
@@ -222,21 +263,6 @@ def otherturn():
 def ACK_otherturn():
     ACK_Other = BoardgameAcknowledgement()
     ACK_Other.send_message_to_process()
-
-TempB = otherturn()
-if TempB == "TRN_OK":
-    ACK_otherturn()
-
-
-'''
-3-3. Request judge
-RequestJudge : [World] -> [BoardgameJudge]
-ACK : [BoardgameJudge] -> [World]
-ReturnJudge : [BoardgameJudge] -> [World]
-'''
-
-# RequestJudge : BoardgameRequestJudgement
-# test : 2;1;2;3;3;1;1;2;1;2;1;2;1;2
 
 def requestjudge():
     # get info from process
@@ -267,19 +293,6 @@ def ACK_judgerequest():
     ACK_Judgerequest = BoardgameAcknowledgement()
     ACK_Judgerequest.send_message_to_process()
 
-Temp2 = requestjudge()
-if Temp2 == "RQJ_OK":
-    ACK_judgerequest()
-
-# !!! BoardgameJudge logic !!!
-
-
-
-
-
-
-
-# ReturnJudge : BoardgameResponseJudgement
 def returnjudge():
     ReturnJudge = BoardgameResponseJudgement()
     GameResult = JudgeL
@@ -295,7 +308,94 @@ def returnjudge():
 
     return GameResult.is_game_end
 
-isgameend = returnjudge()
+def sequencedecision():
+    # Otherturn이 먼저인지, Maketurn이 먼저인지 판별할 것.
+    # 현재 이 방법은 문제가 있음.
+    try:
+        OtherTurnTemp = BoardgameNotifyOtherTurn()
+        OtherTurnTemp.receive_message_from_process()
+        player_index = OtherTurnTemp.player_index
+        move = OtherTurnTemp.move
+        remain_time_milliseconds = OtherTurnTemp.remain_time_milliseconds
+        getxy = [move.x, move.y]
+
+        if player_index != 0 and getxy != [0,0] and remain_time_milliseconds != 0:
+            # 만약 __init__에 있는 값이 나온다면, Maketurn이 먼저. 즉 내 player가 먼저 시작
+            return [1,]
+        else:
+            # 만약 다른 값이 나온다면, Otherturn이 먼저임을 의미. 즉 상대 player가 먼저 시작
+            return [2,]
+
+    except:
+
+        # 오류가 나는 것으로, 이는 Maketurn이 먼저임을 의미. 즉 내 player가 먼저 시작
+        return [1,]
+
+decision = sequencedecision()
+isgameend = False
+
+if decision[0] == 1:
+    # Maketurn이 먼저
+    while isgameend != True:
+        TempM1 = maketurn()
+        if TempM1 == "RQT_OK":
+            ACK_maketurn()
+
+        turnresult()
+
+        TempM2 = requestjudge()
+        if TempM2 == "RQJ_OK":
+            ACK_judgerequest()
+
+        JudgeL.logic()
+        isgameend = returnjudge()
+
+        if isgameend == True:
+            break
+
+        TempM3 = otherturn()
+        if TempM3 == "TRN_OK":
+            ACK_otherturn()
+
+        TempO2 = requestjudge()
+        if TempO2 == "RQJ_OK":
+            ACK_judgerequest()
+
+        JudgeL.logic()
+        isgameend = returnjudge()
+
+
+if decision[0] == 2:
+    # otherturn이 먼저
+    while isgameend != True:
+        TempO1 = otherturn()
+        if TempO1 == "TRN_OK":
+            ACK_otherturn()
+
+        TempO2 = requestjudge()
+        if TempO2 == "RQJ_OK":
+            ACK_judgerequest()
+
+        JudgeL.logic()
+        isgameend = returnjudge()
+
+        if isgameend == True:
+            break
+
+        TempO3 = maketurn()
+        if TempO3 == "RQT_OK":
+            ACK_maketurn()
+
+        turnresult()
+
+        TempO4 = requestjudge()
+        if TempO4 == "RQJ_OK":
+            ACK_judgerequest()
+
+        JudgeL.logic()
+        isgameend = returnjudge()
+
+
 
 '''
 4. Game End
@@ -304,7 +404,6 @@ ACK : [BoardgamePlayer] -> [World]
 '''
 
 # GameEnd : BoardgameEnd
-# test : 1;1;1;2
 
 def gameend():
     # get info from process
