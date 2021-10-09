@@ -327,7 +327,6 @@ def sequencedecision():
             return [2,]
 
     except:
-
         # 오류가 나는 것으로, 이는 Maketurn이 먼저임을 의미. 즉 내 player가 먼저 시작
         return [1,]
 
