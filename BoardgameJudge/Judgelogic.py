@@ -24,6 +24,7 @@ class repo:
             gameinfo2[i] = kwargs[i]
 
 class judge_logic:
+    # 심판
     def __init__(self):
         self.is_game_end : bool = False
         self.win_player_count = 1

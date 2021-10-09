@@ -311,6 +311,7 @@ def returnjudge():
 def sequencedecision():
     # Otherturn이 먼저인지, Maketurn이 먼저인지 판별할 것.
     # 현재 이 방법은 문제가 있음.
+
     try:
         OtherTurnTemp = BoardgameNotifyOtherTurn()
         OtherTurnTemp.receive_message_from_process()

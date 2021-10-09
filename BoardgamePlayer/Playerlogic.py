@@ -82,6 +82,7 @@ class player_logic:
         self.boardresult = ''
 
     def logicP(self):
+        # 알고리즘이 들어가야 할 부분
         board_use = boardtempP
         pass
 
